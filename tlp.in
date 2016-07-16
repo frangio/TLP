@@ -345,7 +345,7 @@ case "$mode" in
 
     *)
         echo "Error: unknown command \"$mode\"."  1>&2
-        echo "Usage: tlp start|true|bat|false|ac|usb|bayoff|discharge|setcharge|fullcharge|recalibrate|stat|diskid" 1>&2
+        echo "Usage: tlp start|true|bat|false|ac|usb|bayoff|discharge|setcharge|setchargewhileac|fullcharge|recalibrate|stat|diskid" 1>&2
         exitcode=3
         ;;
 esac
