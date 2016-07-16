@@ -2487,8 +2487,8 @@ discharge_battery () { # discharge battery
     return 0
 }
 
-chargewhileac_battery () { # save currrent charge thresholds in
-                           # $THRESHSAVEFILE and set new ones (called from cmd line)
+setchargewhileac_battery () { # save currrent charge thresholds in
+                              # $THRESHSAVEFILE and set new ones (called from cmd line)
     # $1: start charge threshold, $2: stop charge threshold, $3: battery
     # rc: 0=ok/1=error
 
