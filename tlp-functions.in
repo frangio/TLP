@@ -2542,6 +2542,7 @@ save_charge_thresholds () { # save current thresholds in $THRESHSAVEFILE
         st=$?
         read_tpacpi_threshold SP $bat_idx
         sp=$?
+        touch $THRESHSAVEFILE
         echo $st $sp $bat_str | sort -u -k 3,3 - $THRESHSAVEFILE -o $THRESHSAVEFILE
     else
         echo "Error: setchargeonce function not available for this ThinkPad model." 1>&2
