@@ -76,6 +76,7 @@ readonly MOD_TPACPI="acpi_call"
 readonly PWRRUNFILE=$RUNDIR/last_pwr
 readonly LOCKFILE=$RUNDIR/lock
 readonly LOCKTIMEOUT=2
+readonly THRESHSAVEFILE=$RUNDIR/saved_thresholds
 
 readonly RDW_NM_LOCK="rdw_nm"
 readonly RDW_DOCK_LOCK="rdw_dock"
@@ -2484,6 +2485,81 @@ discharge_battery () { # discharge battery
     echo "Done: battery $bat_str was completely discharged."
     echo_debug "bat" "discharge_battery.complete($bat_str)"
     return 0
+}
+
+chargewhileac_battery () { # save currrent charge thresholds in
+                           # $THRESHSAVEFILE and set new ones (called from cmd line)
+    # $1: start charge threshold, $2: stop charge threshold, $3: battery
+    # rc: 0=ok/1=error
+
+    local bat st sp
+
+    # check params
+    case $# in
+        0) # no args
+            st=96
+            sp=100
+            bat=DEF   # use default(1st) battery
+            ;;
+
+        1) # assume $1 is battery
+            st=96
+            sp=100
+            bat=$1
+            ;;
+
+        2) # assume $1,$2 are thresholds
+            st=$1
+            sp=$2
+            bat=DEF # use default(1st) battery
+            ;;
+
+        3) # assume $1,$2 are thresholds, $3 is battery
+            st=$1
+            sp=$2
+            bat=$3
+            ;;
+    esac
+
+    # convert bat to uppercase
+    bat=$(printf '%s' "$bat" | tr "[:lower:]" "[:upper:]")
+
+    # check bat presence and/or get default(1st) battery
+    check_tp_battery $bat
+
+    save_charge_thresholds
+    setcharge_battery $st $sp $bat
+}
+
+save_charge_thresholds () { # save current thresholds in $THRESHSAVEFILE
+    # global param: $bat_idx, $bat_str, $tpacpi, $tpsmapi
+    # rc: 0=ok/1=error
+
+    local st sp
+
+    if [ $tpacpi -eq 0 ]; then
+        echo "Error: fullchargeonce function not available for this ThinkPad model." 1>&2
+        return 1
+    else
+        read_tpacpi_threshold ST $bat_idx
+        st=$?
+        read_tpacpi_threshold SP $bat_idx
+        sp=$?
+        echo $st $sp $bat_str | sort -u -k 3,3 - $THRESHSAVEFILE -o $THRESHSAVEFILE
+    fi
+}
+
+restore_saved_charge_thresholds () { # restore thresholds saved in $THRESHSAVEFILE
+    # rc: 0=ok/1=error
+
+    local st sp bat
+
+    if [ -f $THRESHSAVEFILE ]; then
+        while read -r start_thresh stop_thresh bat < $THRESHSAVEFILE; do
+            setcharge_battery $start_thresh $stop_thresh $bat || return $?
+        done
+        rm $THRESHSAVEFILE
+    fi
 }
 
 # --- Drive Bay

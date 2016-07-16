@@ -171,6 +171,7 @@ case "$mode" in
                 [ "$pwrmode" = "1" ] && poweroff_drivebay 0
                 set_radio_device_states $pwrmode
             fi
+            restore_saved_charge_thresholds
             unlock_tlp
         else
             exitcode=4
@@ -269,6 +270,16 @@ case "$mode" in
         check_root
         setcharge_battery $2 $3 $4
         exitcode=$?
+        ;;
+
+    setchargewhileac) # change charge thresholds until AC unplug (defaults to fullcharge thresholds)
+        if check_ac_power setchargewhileac; then
+            check_root
+            setchargewhileac_battery $2 $3 $4
+            exitcode=$?
+        else
+            exitcode=2
+        fi
         ;;
 
     fullcharge) # charge battery up to 100% (temporarily)
