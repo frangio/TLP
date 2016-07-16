@@ -2538,14 +2538,14 @@ save_charge_thresholds () { # save current thresholds in $THRESHSAVEFILE
     local st sp
 
     if [ $tpacpi -eq 0 ]; then
-        echo "Error: fullchargeonce function not available for this ThinkPad model." 1>&2
-        return 1
-    else
         read_tpacpi_threshold ST $bat_idx
         st=$?
         read_tpacpi_threshold SP $bat_idx
         sp=$?
         echo $st $sp $bat_str | sort -u -k 3,3 - $THRESHSAVEFILE -o $THRESHSAVEFILE
+    else
+        echo "Error: setchargeonce function not available for this ThinkPad model." 1>&2
+        return 1
     fi
 }
 
