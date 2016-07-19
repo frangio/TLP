@@ -2556,9 +2556,9 @@ restore_saved_charge_thresholds () { # restore thresholds saved in $THRESHSAVEFI
     local st sp bat
 
     if [ -f $THRESHSAVEFILE ]; then
-        while read -r st sp bat < $THRESHSAVEFILE; do
+        while read -r st sp bat; do
             setcharge_battery $st $sp $bat || return $?
-        done
+        done < $THRESHSAVEFILE
         rm $THRESHSAVEFILE
     fi
 }
