@@ -171,7 +171,7 @@ case "$mode" in
                 [ "$pwrmode" = "1" ] && poweroff_drivebay 0
                 set_radio_device_states $pwrmode
             fi
-            restore_saved_charge_thresholds
+            [ "$pwrmode" = "0" ] && restore_saved_charge_thresholds
             unlock_tlp
         else
             exitcode=4
